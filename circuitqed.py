@@ -29,7 +29,6 @@ class Schrodinger:
         """
         self.solved = False
         self.sparse_args = sparse_args
-        self.solved = False
         if solve: self.solve()
 
     @staticmethod
@@ -547,7 +546,6 @@ def test_transmon():
     print("E_01 = %f\t<0|n|1> = %f\talpha = %f" % (t.Emn(), t.charge(0, 1), t.alpha()))
 
     nglist = np.linspace(-4, 4., 100)
-    levels = 20
     transmonEnergies = np.transpose([transmon(Ej, Ec, ng, charges=20, levels=5).energies for ng in nglist])
 
     for te in transmonEnergies:
