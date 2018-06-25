@@ -288,6 +288,38 @@ class Fluxonium(Schrodinger1D):
         return self.reduced_operator(Schrodinger.Dmat(len(self.phis), self.phis[1] - self.phis[0]), num_levels)
 
 
+class CooperPairBox(Schrodinger1D):
+    """Customized 1D Schrodinger solver class for Cooper Pair Box qubits,
+       allows you to specify properties using conventional circuit parameters"""
+
+    def __init__(self, Ej, Ec, Ng, periodic=False, Ns=None, sparse_args=None, solve=True):
+        """
+        @param Ej Josephson energy
+        @param Ec Charging energy
+        @param Ng Gate charge offset
+        @param Ns Charges in charge basis for solving (default is [-20, -19, ..., 20])
+        """
+        self.Ej = Ej
+        self.Ec = Ec
+        self.Ng = Ng
+        self.Ns = Ns or np.arange(-20, 21)
+
+        super().__init__(x=self.Ns, U=self.cpb_qubit_potential(),
+                         periodic=periodic, sparse_args=sparse_args, solve=solve)
+
+    def Kmat(self):
+        return sparse.spdiags([self.Ec * (N - self.Ng) ** 2 for N in self.Ns], 0,
+                              len(self.Ns), len(self.Ns))
+
+    def Vmat(self):
+        ones = [-self.Ej / 2] * len(self.Ns)
+        return sparse.spdiags([ones, ones], [1, -1], len(self.Ns), len(self.Ns))
+
+    def cpb_qubit_potential(self):
+        """Make Cooper Pair Box qubit potential from circuit parameters"""
+        return [0] * self.Ns
+
+
 class FluxQubit(Schrodinger1D):
     """Customized 1D Schrodinger solver class for flux qubits, 
        allows you to specify properties using conventional circuit parameters"""
