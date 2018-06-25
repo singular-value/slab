@@ -137,12 +137,16 @@ class Schrodinger1D(Schrodinger):
         self.q = q
         Schrodinger.__init__(self, **kwargs)
 
+    def Kmat(self):
+        return -self.KE * Schrodinger.D2mat(numpts=len(self.x), delta=self.x[1] - self.x[0],
+                                            periodic=self.periodic, q=self.q)
+
+    def Vmat(self):
+        return sparse.spdiags([self.U], [0], len(self.U), len(self.U))
+
     def Hamiltonian(self):
         """Constructs Hamiltonian using the potential and Kinetic energy terms"""
-        Vmat = sparse.spdiags([self.U], [0], len(self.U), len(self.U))
-        Kmat = -self.KE * Schrodinger.D2mat(numpts=len(self.x), delta=self.x[1] - self.x[0], periodic=self.periodic,
-                                            q=self.q)
-        return Kmat + Vmat
+        return self.Kmat() + self.Vmat()
 
     def plot(self, num_levels=10,psi_size=None):
         """Plots potential, energies, and wavefunctions
