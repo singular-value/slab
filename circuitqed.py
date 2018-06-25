@@ -148,7 +148,7 @@ class Schrodinger1D(Schrodinger):
         """Constructs Hamiltonian using the potential and Kinetic energy terms"""
         return self.Kmat() + self.Vmat()
 
-    def plot(self, num_levels=10,psi_size=None):
+    def plot(self, num_levels=10,psi_size=None, include_wavefunctions=True):
         """Plots potential, energies, and wavefunctions
         @param num_levels (-1 by default) number of levels to plot"""
         psize=psi_size
@@ -156,9 +156,13 @@ class Schrodinger1D(Schrodinger):
         if num_levels == -1:
             num_levels = len(self.energies()) - 1
         plot(self.x/(2*pi), self.U)
+
         for ind in range(num_levels):
             plot(array([self.x[0], self.x[-1]])/(2*pi), array([self.energies()[ind], self.energies()[ind]]),
                  label="$E_%d$" % ind)
+
+            if not include_wavefunctions:
+                continue
             if psi_size is None:
                 psize=max(abs(self.energies()[ind + 1] - self.energies()[ind]) / 2., 1)/ max(abs(self.psis()[ind]))
             plot(self.x/(2*pi), self.psis()[ind] * psize + self.energies()[ind],
